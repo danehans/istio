@@ -34,14 +34,19 @@ func convertIngress(ingress v1beta1.Ingress, domainSuffix string) []model.Config
 	out := make([]model.Config, 0)
 	tls := ""
 
-	if len(ingress.Spec.TLS) > 0 {
-		// TODO(istio/istio/issues/1424): implement SNI
-		if len(ingress.Spec.TLS) > 1 {
-			glog.Warningf("ingress %s requires several TLS secrets but Envoy can only serve one", ingress.Name)
-		}
-		secret := ingress.Spec.TLS[0]
-		tls = fmt.Sprintf("%s.%s", secret.SecretName, ingress.Namespace)
+	if len(ingress.Spec.TLS) == 0 {
+		glog.Warningf("ingress %s/%s does not use tls\n", ingress.Namespace, ingress.Name)
 	}
+
+	secret := ingress.Spec.TLS[0]
+	if len(secret.Hosts) == 0 {
+		glog.Warningf("ingress %s/%s defaulting to wildcard host setting\n", ingress.Namespace, ingress.Name)
+	}
+	if secret.SecretName == nil {
+		glog.Warningf("ingress %s/%s performing SSL routing based on SNI hostname",
+			ingress.Namespace, ingress.Name)
+	}
+	tls = fmt.Sprintf("%s.%s", secret.SecretName, ingress.Namespace)
 
 	if ingress.Spec.Backend != nil {
 		name := encodeIngressRuleName(ingress.Name, 0, 0)

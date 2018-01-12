@@ -195,7 +195,6 @@ var (
 			if role.Type == proxy.Ingress {
 				certs = append(certs, envoy.CertSource{
 					Directory: proxy.IngressCertsPath,
-					Files:     []string{proxy.IngressCertFilename, proxy.IngressKeyFilename},
 				})
 			}
 
