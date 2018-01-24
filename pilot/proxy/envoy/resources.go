@@ -256,6 +256,11 @@ type Runtime struct {
 	Default int    `json:"default"`
 }
 
+// Hash Policy definition for consistent hashing-based load balancing
+type HashPolicy struct {
+	HeaderName string `json:"header_name"`
+}
+
 // Decorator definition
 type Decorator struct {
 	Operation string `json:"operation"`
@@ -282,6 +287,7 @@ type HTTPRoute struct {
 	TimeoutMS    int64             `json:"timeout_ms"`
 	RetryPolicy  *RetryPolicy      `json:"retry_policy,omitempty"`
 	OpaqueConfig map[string]string `json:"opaque_config,omitempty"`
+	HashPolicy   HashPolicy        `json:"hash_policy,omitempty"`
 
 	AutoHostRewrite  bool `json:"auto_host_rewrite,omitempty"`
 	WebsocketUpgrade bool `json:"use_websocket,omitempty"`
