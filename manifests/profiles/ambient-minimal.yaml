@@ -1,0 +1,47 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: ambient-only-istio
+spec:
+  profile: empty
+
+  # Enable the essential components for Ambient mode
+  components:
+    base:
+      enabled: true
+    pilot:
+      enabled: true
+      k8s:
+        env:
+          - name: PILOT_ENABLE_AMBIENT
+            value: "true"
+    ztunnel:
+      enabled: true
+    cni:
+      enabled: true
+    # Disable unnecessary components
+    ingressGateways:
+      - name: istio-ingressgateway
+        enabled: false
+    egressGateways:
+      - name: istio-egressgateway
+        enabled: false
+    istiodRemote:
+      enabled: false
+
+  # Configure meshConfig and disable features not required in ambient mode
+  meshConfig:
+    accessLogFile: ""
+    defaultConfig:
+      proxyMetadata:
+        ISTIO_META_ENABLE_HBONE: "true"
+      holdApplicationUntilProxyStarts: false
+
+  # Configure the CNI plugin
+  values:
+    cni:
+      enabled: true
+    global:
+      proxy:
+        autoInject: disabled
